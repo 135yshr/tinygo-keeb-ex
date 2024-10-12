@@ -30,6 +30,10 @@ func NewDisplay() *Display {
 	}
 }
 
+func (d *Display) Device() *ssd1306.Device {
+	return &d.disp
+}
+
 func (d *Display) SetPixel(x, y int16, c color.RGBA) {
 	d.disp.SetPixel(x, y, c)
 }
