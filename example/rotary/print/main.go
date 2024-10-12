@@ -3,10 +3,10 @@ package main
 import "github.com/135yshr/tinygo-keeb-ex/pkg/pin"
 
 func main() {
-	vol := pin.NewVolume()
+	rot := pin.NewRotary()
 
 	for oldValue := 0; ; {
-		if newValue := vol.Value(); newValue != oldValue {
+		if newValue := rot.Position(); newValue != oldValue {
 			println("value: ", newValue)
 			oldValue = newValue
 		}
