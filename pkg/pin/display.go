@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"machine"
 
+	"tinygo.org/x/drivers"
 	"tinygo.org/x/drivers/ssd1306"
 )
 
@@ -34,6 +35,10 @@ func (d *Display) Device() *ssd1306.Device {
 	return &d.disp
 }
 
+func (d *Display) Rotated() *RotatedDisplay {
+	return &RotatedDisplay{&d.disp}
+}
+
 func (d *Display) SetPixel(x, y int16, c color.RGBA) {
 	d.disp.SetPixel(x, y, c)
 }
@@ -44,4 +49,17 @@ func (d *Display) Display() error {
 
 func (d *Display) Clear() {
 	d.disp.ClearDisplay()
+}
+
+type RotatedDisplay struct {
+	drivers.Displayer
+}
+
+func (d *RotatedDisplay) Size() (x, y int16) {
+	return y, x
+}
+
+func (d *RotatedDisplay) SetPixel(x, y int16, c color.RGBA) {
+	_, sy := d.Displayer.Size()
+	d.Displayer.SetPixel(y, sy-x, c)
 }
