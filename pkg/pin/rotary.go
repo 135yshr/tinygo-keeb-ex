@@ -6,11 +6,11 @@ import (
 	"tinygo.org/x/drivers/encoders"
 )
 
-type Volume struct {
+type Rotary struct {
 	enc *encoders.QuadratureDevice
 }
 
-func NewVolume(precision int) *Volume {
+func NewRotary(precision int) *Rotary {
 	enc := encoders.NewQuadratureViaInterrupt(
 		machine.GPIO3,
 		machine.GPIO4,
@@ -19,11 +19,11 @@ func NewVolume(precision int) *Volume {
 		Precision: precision,
 	})
 
-	return &Volume{
+	return &Rotary{
 		enc: enc,
 	}
 }
 
-func (v *Volume) Value() int {
-	return v.enc.Position()
+func (r *Rotary) Position() int {
+	return r.enc.Position()
 }
