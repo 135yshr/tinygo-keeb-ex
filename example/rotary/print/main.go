@@ -3,7 +3,7 @@ package main
 import "github.com/135yshr/tinygo-keeb-ex/pkg/pin"
 
 func main() {
-	rot := pin.NewRotary()
+	rot := pin.NewRotary(4)
 
 	for oldValue := 0; ; {
 		if newValue := rot.Position(); newValue != oldValue {

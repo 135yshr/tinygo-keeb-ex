@@ -10,13 +10,13 @@ type Rotary struct {
 	enc *encoders.QuadratureDevice
 }
 
-func NewRotary() *Rotary {
+func NewRotary(precision int) *Rotary {
 	enc := encoders.NewQuadratureViaInterrupt(
 		machine.GPIO3,
 		machine.GPIO4,
 	)
 	enc.Configure(encoders.QuadratureConfig{
-		Precision: 4,
+		Precision: precision,
 	})
 
 	return &Rotary{
