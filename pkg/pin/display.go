@@ -14,6 +14,7 @@ type Display interface {
 	Rotate(r drivers.Rotation) Display
 	Rotation() drivers.Rotation
 	Clear()
+	ClearBuffer()
 }
 
 type display struct {
@@ -30,9 +31,10 @@ func NewDisplay() Display {
 
 	i2c0 := ssd1306.NewI2C(machine.I2C0)
 	i2c0.Configure(ssd1306.Config{
-		Address: 0x3C,
-		Width:   128,
-		Height:  64,
+		Address:  0x3C,
+		Width:    128,
+		Height:   64,
+		Rotation: drivers.Rotation180,
 	})
 
 	return &display{
@@ -59,6 +61,10 @@ func (d *display) Display() error {
 
 func (d *display) Clear() {
 	d.disp.ClearDisplay()
+}
+
+func (d *display) ClearBuffer() {
+	d.disp.ClearBuffer()
 }
 
 func (d *display) Rotation() drivers.Rotation {
