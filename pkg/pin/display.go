@@ -8,77 +8,117 @@ import (
 	"tinygo.org/x/drivers/ssd1306"
 )
 
-const (
-	Rotate0 Rotate = iota
-	Rotate90
-	Rotate180
-	Rotate270
-)
+type Display interface {
+	drivers.Displayer
 
-type Rotate int
-
-type Display struct {
-	disp ssd1306.Device
+	Rotate(r drivers.Rotation) Display
+	Rotation() drivers.Rotation
+	Clear()
 }
 
-func NewDisplay() *Display {
+type display struct {
+	disp     ssd1306.Device
+	rotation drivers.Rotation
+}
+
+func NewDisplay() Display {
 	machine.I2C0.Configure(machine.I2CConfig{
 		Frequency: 2.8 * machine.MHz,
 		SDA:       machine.GPIO12,
 		SCL:       machine.GPIO13,
 	})
 
-	disp := ssd1306.NewI2C(machine.I2C0)
-	disp.Configure(ssd1306.Config{
+	i2c0 := ssd1306.NewI2C(machine.I2C0)
+	i2c0.Configure(ssd1306.Config{
 		Address: 0x3C,
 		Width:   128,
 		Height:  64,
 	})
 
-	return &Display{
-		disp: disp,
+	return &display{
+		disp:     i2c0,
+		rotation: drivers.Rotation0,
 	}
 }
 
-func (d *Display) Device() *ssd1306.Device {
-	return &d.disp
+func NewRotatedDisplay(r drivers.Rotation) Display {
+	return NewDisplay().Rotate(r)
 }
 
-func (d *Display) Rotated(r Rotate) *RotatedDisplay {
-	return &RotatedDisplay{&d.disp, r}
+func (d *display) Size() (x, y int16) {
+	return d.disp.Size()
 }
 
-func (d *Display) SetPixel(x, y int16, c color.RGBA) {
+func (d *display) SetPixel(x, y int16, c color.RGBA) {
 	d.disp.SetPixel(x, y, c)
 }
 
-func (d *Display) Display() error {
+func (d *display) Display() error {
 	return d.disp.Display()
 }
 
-func (d *Display) Clear() {
+func (d *display) Clear() {
 	d.disp.ClearDisplay()
 }
 
-type RotatedDisplay struct {
-	drivers.Displayer
-	rotate Rotate
+func (d *display) Rotation() drivers.Rotation {
+	return d.rotation
 }
 
-func (d *RotatedDisplay) Size() (x, y int16) {
+func (d *display) Rotate(r drivers.Rotation) Display {
+	newDisplay := &display{
+		disp:     d.disp,
+		rotation: r,
+	}
+	switch r {
+	case drivers.Rotation0:
+		return &rotattion0Display{newDisplay}
+	case drivers.Rotation90:
+		return &rotetion90Display{newDisplay}
+	case drivers.Rotation180:
+		return &rotetion180Display{newDisplay}
+	case drivers.Rotation270:
+		return &rotetion270Display{newDisplay}
+	default:
+		panic("Not supported rotation")
+	}
+}
+
+type rotattion0Display struct {
+	*display
+}
+
+type rotetion90Display struct {
+	*display
+}
+
+func (d *rotetion90Display) Size() (x, y int16) {
 	return y, x
 }
 
-func (d *RotatedDisplay) SetPixel(x, y int16, c color.RGBA) {
-	sx, sy := d.Displayer.Size()
-	switch d.rotate {
-	case Rotate0:
-		d.Displayer.SetPixel(x, y, c)
-	case Rotate90:
-		d.Displayer.SetPixel(y, sy-x, c)
-	case Rotate180:
-		d.Displayer.SetPixel(sx-y, sy-x, c)
-	case Rotate270:
-		d.Displayer.SetPixel(sx-y, x, c)
-	}
+func (d *rotetion90Display) SetPixel(x, y int16, c color.RGBA) {
+	_, sy := d.display.Size()
+	d.display.SetPixel(y, sy-x, c)
+}
+
+type rotetion180Display struct {
+	*display
+}
+
+func (d *rotetion180Display) SetPixel(x, y int16, c color.RGBA) {
+	sx, sy := d.display.Size()
+	d.display.SetPixel(sx-x, sy-y, c)
+}
+
+type rotetion270Display struct {
+	*display
+}
+
+func (d *rotetion270Display) Size() (x, y int16) {
+	return y, x
+}
+
+func (d *rotetion270Display) SetPixel(x, y int16, c color.RGBA) {
+	sx, _ := d.display.Size()
+	d.display.SetPixel(sx-y, x, c)
 }

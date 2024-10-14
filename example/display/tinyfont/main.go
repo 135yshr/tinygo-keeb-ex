@@ -16,7 +16,7 @@ func main() {
 	display.Clear()
 	time.Sleep(50 * time.Millisecond)
 
-	tinyfont.WriteLine(display.Device(), &freemono.Bold9pt7b, 5, 10, "hello", color.White)
-	tinyfont.WriteLine(display.Device(), &gophers.Regular32pt, 5, 50, "ABCEF", color.White)
+	tinyfont.WriteLine(display, &freemono.Bold9pt7b, 5, 10, "hello", color.White)
+	tinyfont.WriteLine(display, &gophers.Regular32pt, 5, 50, "ABCEF", color.White)
 	display.Display()
 }
