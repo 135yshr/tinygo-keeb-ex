@@ -7,12 +7,16 @@ import (
 	"tinygo.org/x/drivers/encoders"
 )
 
+type RotaryPushButtonEvent func()
+
+type RotaryReleasedEvent func()
+
 type Rotary struct {
 	enc *encoders.QuadratureDevice
 	btn machine.Pin
 
-	pressedEvents []func()
-	releasedEvents []func()
+	pressedEvents []RotaryPushButtonEvent
+	releasedEvents []RotaryReleasedEvent
 }
 
 func NewRotary(precision int) *Rotary {
@@ -37,20 +41,20 @@ func (r *Rotary) Position() int {
 	return r.enc.Position()
 }
 
-func (r *Rotary) AddPressedEvent(f func()) {
+func (r *Rotary) AddPressedEvent(f RotaryPushButtonEvent) {
 	r.pressedEvents = append(r.pressedEvents, f)
 }
 
 func (r *Rotary) ClearPressedEvents() {
-	r.pressedEvents = []func(){}
+	r.pressedEvents = []RotaryPushButtonEvent{}
 }
 
-func (r *Rotary) AddReleasedEvent(f func()) {
+func (r *Rotary) AddReleasedEvent(f RotaryReleasedEvent) {
 	r.releasedEvents = append(r.releasedEvents, f)
 }
 
 func (r *Rotary) ClearReleasedEvents() {
-	r.releasedEvents = []func(){}
+	r.releasedEvents = []RotaryReleasedEvent{}
 }
 
 func (r *Rotary) ThreadPressed() {
