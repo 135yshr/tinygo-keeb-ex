@@ -1,6 +1,6 @@
 # tinygo_keeb-ex
 
-This is a library for programming with a homemade keyboard created by [TinyGo Keeb Tour 2024](https://github.com/sago35/tinygo_keeb_workshop_2024TinyGo)
+This is a library for programming with a homemade keyboard created by [TinyGo Keeb Tour 2024](https://github.com/sago35/tinygo_keeb_workshop_2024)
 
 ## Getting Started
 
